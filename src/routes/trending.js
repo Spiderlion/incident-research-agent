@@ -1,12 +1,9 @@
-const trendingNews = require('../src/services/trendingNews');
-const config = require('../src/config');
+const express = require('express');
+const router = express.Router();
+const trendingNews = require('../services/trendingNews');
+const config = require('../config');
 
-// Vercel Serverless Function Handler
-module.exports = async function handler(req, res) {
-    if (req.method !== 'GET') {
-        return res.status(405).json({ error: 'Method Not Allowed' });
-    }
-
+router.get('/', async (req, res) => {
     // Vercel deployment keys check
     if (process.env.VERCEL) {
         if (!config.apiKeys.serpapi) {
@@ -17,14 +14,16 @@ module.exports = async function handler(req, res) {
 
     try {
         const period = req.query.period || 'today';
-        console.log(`\n📈 [API-VERCEL] Fetching trending news for period: ${period}`);
+        console.log(`\n📈 [API] Fetching trending news for period: ${period}`);
 
         const results = await trendingNews.fetchTrending(period);
 
-        console.log(`✅ [API-VERCEL] Trending news fetched successfully. Return ${results.length} items.`);
+        console.log(`✅ [API] Trending news fetched successfully. Return ${results.length} items.`);
         return res.status(200).json(results);
     } catch (error) {
-        console.error(`❌ [API-VERCEL] Error fetching trending news:`, error.message);
+        console.error(`❌ [API] Error fetching trending news:`, error.message);
         return res.status(500).json({ error: 'Internal server error fetching trending news.' });
     }
-};
+});
+
+module.exports = router;

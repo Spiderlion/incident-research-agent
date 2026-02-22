@@ -1,14 +1,10 @@
-const searchOrchestrator = require('../src/services/searchOrchestrator');
-const aiSummary = require('../src/services/aiSummary');
-const config = require('../src/config');
+const express = require('express');
+const router = express.Router();
+const searchOrchestrator = require('../services/searchOrchestrator');
+const aiSummary = require('../services/aiSummary');
+const config = require('../config');
 
-// Vercel Serverless Function Handler
-module.exports = async function handler(req, res) {
-    // Only accept POST requests
-    if (req.method !== 'POST') {
-        return res.status(405).json({ error: 'Method Not Allowed' });
-    }
-
+router.post('/', async (req, res) => {
     // Vercel deployment keys check
     if (process.env.VERCEL) {
         if (!config.apiKeys.serpapi || !config.apiKeys.gemini) {
@@ -25,13 +21,13 @@ module.exports = async function handler(req, res) {
             return res.status(400).json({ error: 'Query is required.' });
         }
 
-        console.log(`\n🔍 [API-VERCEL] Received research query: "${query}"`);
+        console.log(`\n🔍 [API] Received research query: "${query}"`);
 
         // Orchestrate parallel searches
         const results = await searchOrchestrator.runAll(query);
 
         // Build context from results for the AI summary
-        console.log(`🧠 [API-VERCEL] Building context for AI summary...`);
+        console.log(`🧠 [API] Building context for AI summary...`);
         let contextText = '';
 
         // Take top 5 textual snippets across all results
@@ -47,12 +43,14 @@ module.exports = async function handler(req, res) {
         // Generate the structured AI summary
         const summary = await aiSummary.generateSummary(query, contextText);
 
-        console.log(`✅ [API-VERCEL] Query "${query}" completed successfully. Returning ${results.length} total results.`);
+        console.log(`✅ [API] Query "${query}" completed successfully. Returning ${results.length} total results.`);
         return res.status(200).json({ results, summary });
 
     } catch (error) {
-        console.error(`❌ [API-VERCEL] Error processing research request:`, error.message);
+        console.error(`❌ [API] Error processing research request:`, error.message);
         // Never crash the request
         return res.status(500).json({ error: 'Internal server error during research orchestration.' });
     }
-};
+});
+
+module.exports = router;

@@ -3,8 +3,8 @@ const path = require('path');
 const cors = require('cors');
 const { validateEnvironment } = require('./utils/validator');
 const config = require('./config');
-const researchHandler = require('../api/research');
-const trendingHandler = require('../api/trending');
+const researchRoute = require('./routes/research');
+const trendingRoute = require('./routes/trending');
 
 // Initialize Express app
 const app = express();
@@ -17,18 +17,24 @@ app.use(express.static(path.join(__dirname, '../public'))); // Serve the fronten
 // Validate .env keys on startup
 validateEnvironment();
 
-// Routes (Mapped to Serverless Functions)
-app.post('/api/research', researchHandler);
-app.get('/api/trending', trendingHandler);
+// Routes
+app.use('/api/research', researchRoute);
+app.use('/api/trending', trendingRoute);
 
 // Basic health check
 app.get('/health', (req, res) => {
     res.status(200).json({ status: 'ok', message: 'Incident Research Agent is running.' });
 });
 
-// Start Express server
-const PORT = config.port;
-app.listen(PORT, () => {
-    console.log(`\n🚀 [SERVER] Starting in ${config.nodeEnv} mode...`);
-    console.log(`✅ [SERVER] Listening at http://localhost:${PORT}`);
-});
+// Start Express server locally or export for Vercel
+const PORT = config.port || 3000;
+
+if (process.env.NODE_ENV !== 'production' && !process.env.VERCEL) {
+    app.listen(PORT, () => {
+        console.log(`\n🚀 [SERVER] Starting in ${config.nodeEnv} mode...`);
+        console.log(`✅ [SERVER] Listening at http://localhost:${PORT}`);
+    });
+}
+
+// Export the Express app as a Serverless Function handler
+module.exports = app;

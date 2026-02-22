@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Incident Research Agent | Glido Labs</title>
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Space+Grotesk:wght@500;700&display=swap"
+    rel="stylesheet">
+
+  <!-- Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+
+<body>
+
+  <!-- Dynamic Ambient Background -->
+  <div id="ambient-background"></div>
+
+  <!-- Loading Progress Bar -->
+  <div id="progress-container" class="hidden">
+    <div id="progress-bar"></div>
+  </div>
+
+  <header>
+    <div class="brand">
+      <span class="logo-mark"><i class="fa-solid fa-layer-group"></i></span>
+      <h1>GLIDO <span>LABS</span></h1>
+    </div>
+
+    <div class="search-container">
+      <div class="search-row">
+        <form id="search-form">
+          <i class="fa-solid fa-sparkles spark-icon"></i>
+          <input type="text" id="search-query" placeholder="Ask anything about an incident..." autocomplete="off"
+            required>
+          <button type="submit" id="search-btn"><i class="fa-solid fa-arrow-right"></i></button>
+        </form>
+        <button id="trending-open-btn" class="trending-btn">
+          <i class="fa-solid fa-newspaper"></i> Trending
+        </button>
+      </div>
+    </div>
+
+    <div class="header-actions">
+      <!-- Toggle for Layout -->
+      <button id="layout-toggle" title="Toggle Timeline View">
+        <i class="fa-solid fa-clock-rotate-left"></i> Timeline
+      </button>
+    </div>
+  </header>
+
+  <!-- Loading Status Messages -->
+  <div id="loading-status" class="hidden">
+    <div class="status-message" id="status-text">🔍 Searching Google...</div>
+  </div>
+
+  <main>
+
+    <!-- AI Summary Banner -->
+    <div id="ai-summary" class="hidden collapsed">
+      <div class="summary-header">
+        <i class="fa-solid fa-brain"></i>
+        <h3>AI Incident Summary</h3>
+        <button class="toggle-summary"><i class="fa-solid fa-chevron-down"></i></button>
+      </div>
+      <div class="summary-content" id="ai-summary-content">
+        <!-- Will be dynamically injected by app.js -->
+        <h3 id="summary-headline"></h3>
+        <p id="summary-what-happened"></p>
+        <div id="summary-status-box">
+          <strong><i class="fa-solid fa-satellite-dish"></i> Current Status:</strong>
+          <span id="summary-status"></span>
+        </div>
+        <div id="summary-sources-box">
+          <strong><i class="fa-solid fa-link"></i> Key Sources:</strong>
+          <ul id="summary-sources"></ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- Filter Tabs -->
+    <div class="tabs-container hidden" id="tabs-container">
+      <button class="tab-btn active" data-filter="all">All</button>
+      <button class="tab-btn" data-filter="youtube"><i class="fa-brands fa-youtube"></i> Videos</button>
+      <button class="tab-btn" data-filter="image"><i class="fa-regular fa-image"></i> Images</button>
+      <button class="tab-btn" data-filter="news"><i class="fa-regular fa-newspaper"></i> News</button>
+      <button class="tab-btn" data-filter="google"><i class="fa-brands fa-google"></i> Web</button>
+    </div>
+
+    <!-- Results Grid / Timeline -->
+    <div id="results-container" class="layout-grid">
+      <!-- Cards will be injected here via JS -->
+      <div id="welcome-state">
+        <i class="fa-solid fa-globe"></i>
+        <h2>Ready to research.</h2>
+        <p>Enter a query above to orchestrate a parallel search across Google, News, and YouTube.</p>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Video Modal -->
+  <div id="video-modal" class="hidden">
+    <div class="modal-backdrop"></div>
+    <div class="modal-content">
+      <button class="close-modal"><i class="fa-solid fa-xmark"></i></button>
+      <div class="iframe-container" id="iframe-container">
+      </div>
+    </div>
+  </div>
+
+  <!-- Trending Sliding Panel -->
+  <div id="trending-panel" class="sliding-panel">
+    <div class="panel-header">
+      <h2><i class="fa-solid fa-fire"></i> Trending News</h2>
+      <button id="trending-close-btn" class="close-panel-btn"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="panel-filters">
+      <select id="trending-period">
+        <option value="today" selected>Today</option>
+        <option value="yesterday">Yesterday</option>
+        <option value="3days">Last 3 Days</option>
+        <option value="week">Last Week</option>
+        <option value="month">Last Month</option>
+      </select>
+    </div>
+    <div class="panel-content" id="trending-results">
+      <!-- Loading or items injected here -->
+      <div class="trending-placeholder">Select a period to view trends.</div>
+    </div>
+  </div>
+  <div id="trending-backdrop" class="panel-backdrop hidden"></div>
+
+  <script src="/js/app.js"></script>
+</body>
+
+</html>

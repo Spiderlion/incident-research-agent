@@ -14,12 +14,14 @@
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {
+    "@google/genai": "^1.42.0",
     "axios": "^1.13.5",
     "cheerio": "^1.2.0",
     "cors": "^2.8.6",
     "dotenv": "^17.3.1",
     "express": "^5.2.1",
     "googleapis": "^171.4.0",
+    "openai": "^6.22.0",
     "puppeteer": "^24.37.5"
   }
 }

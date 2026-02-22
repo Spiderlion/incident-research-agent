@@ -3,8 +3,8 @@ const path = require('path');
 const cors = require('cors');
 const { validateEnvironment } = require('./utils/validator');
 const config = require('./config');
-const researchRoute = require('./routes/research');
-const trendingRoute = require('./routes/trending');
+const researchHandler = require('../api/research');
+const trendingHandler = require('../api/trending');
 
 // Initialize Express app
 const app = express();
@@ -17,9 +17,9 @@ app.use(express.static(path.join(__dirname, '../public'))); // Serve the fronten
 // Validate .env keys on startup
 validateEnvironment();
 
-// Routes
-app.use('/api/research', researchRoute);
-app.use('/api/trending', trendingRoute);
+// Routes (Mapped to Serverless Functions)
+app.post('/api/research', researchHandler);
+app.get('/api/trending', trendingHandler);
 
 // Basic health check
 app.get('/health', (req, res) => {

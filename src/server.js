@@ -5,6 +5,7 @@ const { validateEnvironment } = require('./utils/validator');
 const config = require('./config');
 const researchRoute = require('./routes/research');
 const trendingRoute = require('./routes/trending');
+const channelRoute = require('./routes/channel');
 
 // Initialize Express app
 const app = express();
@@ -20,6 +21,7 @@ validateEnvironment();
 // Routes
 app.use('/api/research', researchRoute);
 app.use('/api/trending', trendingRoute);
+app.use('/api/channel', channelRoute);
 
 // Basic health check
 app.get('/health', (req, res) => {

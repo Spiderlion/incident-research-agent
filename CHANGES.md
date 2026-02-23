@@ -84,13 +84,6 @@ Here is how the system works in plain English:
 - **Why**: To understand the exact tone, niche, and format style of specific Instagram creators so we can filter open-web trending news directly for their audience.
 ### Change #10B — Channel-Filtered Web Search (Phase B)
 - **Date/Phase**: Phase 10
-- **What was added**: `src/services/channelSearch.js` to translate a DNA Profile's keywords into targeted search queries, execute them concurrently via the Orchestrator, deduplicate by URL, and use Gemini to rank each result from 1-10 based purely on its relevance to the specific channel's DNA.
-- **What was removed/modified**: Extended the unified JSON result schema to include `relevance_score`, `relevance_reason`, and `suggested_angle`.
-- **Why**: To prevent generic search results and instead filter for "What is trending on the web RIGHT NOW that my specific channel would want to cover."
-### Change #10B — Channel-Filtered Web Search (Phase B)
-- **Date/Phase**: Phase 10
-- **What was added**: `src/services/channelSearch.js` to translate a DNA Profile's keywords into targeted search queries, execute them concurrently via the Orchestrator, deduplicate by URL, and use Gemini to rank each result from 1-10 based purely on its relevance to the specific channel's DNA.
-- **What was removed/modified**: Extended the unified JSON result schema to include `relevance_score`, `relevance_reason`, and `suggested_angle`.
 - **Why**: To prevent generic search results and instead filter for "What is trending on the web RIGHT NOW that my specific channel would want to cover."
 - **How to revert**: Remove `channelSearch.js`.
 
@@ -100,3 +93,10 @@ Here is how the system works in plain English:
 - **What was removed/modified**: N/A
 - **Why**: To provide actionable creator guidance on how exactly to cover the retrieved trending news rather than just summarizing the facts independently.
 - **How to revert**: Remove `generateChannelSummary` from `aiSummary.js`.
+
+### Change #10D — Channel API Endpoints (Phase D)
+- **Date/Phase**: Phase 10
+- **What was added**: `src/routes/channel.js` providing `GET /api/channel/profile` (fetches/builds DNA cache) and `GET /api/channel/search` (executes the full channel-filtered orchestrated search).
+- **What was removed/modified**: Configured `src/server.js` to mount these new routes.
+- **Why**: To expose the new Channel Intelligence backend logic securely to the frontend dashboard.
+- **How to revert**: Remove `src/routes/channel.js` and its mounting logic in `src/server.js`.

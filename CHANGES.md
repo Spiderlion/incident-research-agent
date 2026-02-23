@@ -121,7 +121,8 @@ Here is how the system works in plain English:
   - Dynamic `channel` parameter support in the `/api/trending` backend and frontend `loadTrendingNews` fetches.
   - Native filesystem reading of `Dataset_instagram.json` in the AI Summary generation service.
 - **What was removed/modified**: 
-  - `src/services/trendingNews.js` now imports `channelDNA` to build SerpApi queries targeted explicitly to the creator's niche keywords (e.g. `(Startup OR Marketing) news`).
+  - `src/services/trendingNews.js` now imports `channelDNA` to build SerpApi queries targeted explicitly to the creator's niche keywords (e.g. `(Startup OR Marketing) news`). Note: Patched a missing `axios` import that crashed the trending endpoint natively.
   - `src/services/aiSummary.js` now filters the local dataset for the active channel, sorts by `videoPlayCount` descending, and injects the exact captions and statistics of the top 3 all-time posts into the Gemini system prompt.
-- **Why**: To deeply contextualize the Reel Context Briefings based on real-world extreme details and provide an exclusive "Trending Panel" rather than generic global news.
+  - `src/services/channelSearch.js` was hyper-optimized: Reduced parallel orchestrated queries from 3 to 1 to prevent massive API congestion, and capped the data array sent to Gemini for relevance ranking from ~60 objects down to a strict top 15, drastically speeding up the response time.
+- **Why**: To deeply contextualize the Reel Context Briefings based on real-world extreme details, fix crashes on the Trending Panel, and solve aggressive UI freezing/loading times when executing a Channel Intelligence Search.
 - **How to revert**: Checkout the previous commit.

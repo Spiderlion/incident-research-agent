@@ -25,13 +25,11 @@ function buildQueriesFromDNA(dnaProfile) {
         return [`${dnaProfile.primary_topics[0] || 'news'} trending today`];
     }
 
-    // Pick 3 pseudo-random keywords from the profile
-    const keywords = [...dnaProfile.search_keywords].sort(() => 0.5 - Math.random()).slice(0, 3);
+    // Pick 1 pseudo-random keyword from the profile
+    const keywords = [...dnaProfile.search_keywords].sort(() => 0.5 - Math.random());
 
     return [
-        `${keywords[0]} latest news today`,
-        `${keywords[1]} trending viral this week`,
-        `${keywords[2]} recent update 2026`
+        `${keywords[0]} latest news today`
     ];
 }
 
@@ -60,7 +58,8 @@ async function searchForChannel(dnaProfile) {
             }
         }
     }
-    const allResults = Array.from(uniqueResultsMap.values());
+    // Cap the maximum results sent to Gemini to 15 to reduce massive token counts and latency
+    const allResults = Array.from(uniqueResultsMap.values()).slice(0, 15);
     console.log(`[CHANNEL-SEARCH] Gathered ${allResults.length} unique results from web across all queries.`);
 
     if (allResults.length === 0) return [];

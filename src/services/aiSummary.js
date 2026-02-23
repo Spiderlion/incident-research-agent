@@ -90,6 +90,119 @@ function createFallbackSummary(query) {
     };
 }
 
+const CHANNEL_SYSTEM_PROMPT = `You are a content strategist for a specific Instagram channel.
+Based on the channel's content DNA and the trending web results provided, generate a content intelligence brief.
+Return ONLY a valid JSON object matching the schema below. DO NOT wrap the output in markdown code blocks like \`\`\`json. DO NOT add any conversational text.
+
+Required JSON Schema:
+{
+  "headline": "The single biggest trending story/topic right now that fits this channel perfectly — one punchy sentence",
+  "why_this_fits": "Two sentences explaining why this topic matches this channel's DNA and audience",
+  "trending_angle": "The specific angle or hook this channel should take on this topic — different from generic coverage",
+  "reel_brief": {
+    "hook": "The exact opening line or visual concept for the reel — written in this channel tone",
+    "structure": [
+      {
+        "section": "string",
+        "content": "what to say/show here",
+        "duration_seconds": number
+      }
+    ],
+    "key_facts": ["3-5 specific facts from the web results to include in the reel"],
+    "cta": "closing line written in this channel voice",
+    "hashtags": ["15 hashtags matching this channel style"],
+    "music_mood": "string"
+  },
+  "other_trending_topics": [
+    {
+      "topic": "string",
+      "why_relevant": "string",
+      "quick_angle": "string"
+    }
+  ] // 3-4 runner up topics
+}`;
+
+async function generateChannelSummary(dnaProfile, topResults) {
+    if (!dnaProfile || !topResults || topResults.length === 0) {
+        return createFallbackChannelSummary(dnaProfile?.channel || 'Unknown Channel');
+    }
+
+    const contextContext = topResults.map(r => `Title: ${r.title}\nSnippet: ${r.description || r.body || ''}\nURL: ${r.source_link}`).join('\n\n');
+    const prompt = `Channel DNA Profile:\n${JSON.stringify(dnaProfile, null, 2)}\n\nTrending Web Results:\n${contextContext}\n\nChannel's Reel Style Guide:\n${JSON.stringify(dnaProfile.reel_style_guide, null, 2)}`;
+
+    // Try Gemini first
+    if (config.apiKeys.gemini) {
+        try {
+            console.log(`[AI-SUMMARY] Attempting channel summary generation for ${dnaProfile.channel} via Gemini API...`);
+            const ai = new GoogleGenAI({ apiKey: config.apiKeys.gemini });
+
+            const response = await ai.models.generateContent({
+                model: 'gemini-2.5-pro',
+                contents: [
+                    { role: 'user', parts: [{ text: CHANNEL_SYSTEM_PROMPT + '\n\n' + prompt }] }
+                ],
+                config: {
+                    temperature: 0.3,
+                    responseMimeType: 'application/json'
+                }
+            });
+
+            return JSON.parse(response.text);
+        } catch (geminiError) {
+            console.warn(`[AI-SUMMARY] Gemini API failed for channel summary:`, geminiError.message);
+            // Fallthrough to OpenAI or fallback
+        }
+    }
+
+    // Try OpenAI fallback
+    if (config.apiKeys.openai) {
+        try {
+            console.log(`[AI-SUMMARY] Attempting channel summary generation via OpenAI API...`);
+            const openai = new OpenAI({ apiKey: config.apiKeys.openai });
+
+            const completion = await openai.chat.completions.create({
+                model: "gpt-4o",
+                messages: [
+                    { role: "system", content: CHANNEL_SYSTEM_PROMPT },
+                    { role: "user", content: prompt }
+                ],
+                temperature: 0.3,
+                response_format: { type: "json_object" }
+            });
+
+            return JSON.parse(completion.choices[0].message.content);
+        } catch (openaiError) {
+            console.warn(`[AI-SUMMARY] OpenAI API failed for channel summary:`, openaiError.message);
+            // Fallthrough to fallback
+        }
+    }
+
+    console.warn(`[AI-SUMMARY] All AI providers failed. Returning fallback channel summary.`);
+    return createFallbackChannelSummary(dnaProfile.channel);
+}
+
+function createFallbackChannelSummary(channelName) {
+    return {
+        headline: `Trending Output for ${channelName}`,
+        why_this_fits: "Analyzed multiple sources to compile this report.",
+        trending_angle: "Focus on the key facts presented in current events.",
+        reel_brief: {
+            hook: "Latest updates incoming.",
+            structure: [
+                { section: "Intro", content: "Brief context.", duration_seconds: 5 },
+                { section: "Body", content: "Main details.", duration_seconds: 15 },
+                { section: "Outro", content: "See facts.", duration_seconds: 5 }
+            ],
+            key_facts: ["Reference sources for details."],
+            cta: "Stay tuned for more updates.",
+            hashtags: ["#news", "#trending"],
+            music_mood: "Neutral"
+        },
+        other_trending_topics: []
+    };
+}
+
 module.exports = {
-    generateSummary
+    generateSummary,
+    generateChannelSummary
 };

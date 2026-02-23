@@ -87,4 +87,16 @@ Here is how the system works in plain English:
 - **What was added**: `src/services/channelSearch.js` to translate a DNA Profile's keywords into targeted search queries, execute them concurrently via the Orchestrator, deduplicate by URL, and use Gemini to rank each result from 1-10 based purely on its relevance to the specific channel's DNA.
 - **What was removed/modified**: Extended the unified JSON result schema to include `relevance_score`, `relevance_reason`, and `suggested_angle`.
 - **Why**: To prevent generic search results and instead filter for "What is trending on the web RIGHT NOW that my specific channel would want to cover."
+### Change #10B — Channel-Filtered Web Search (Phase B)
+- **Date/Phase**: Phase 10
+- **What was added**: `src/services/channelSearch.js` to translate a DNA Profile's keywords into targeted search queries, execute them concurrently via the Orchestrator, deduplicate by URL, and use Gemini to rank each result from 1-10 based purely on its relevance to the specific channel's DNA.
+- **What was removed/modified**: Extended the unified JSON result schema to include `relevance_score`, `relevance_reason`, and `suggested_angle`.
+- **Why**: To prevent generic search results and instead filter for "What is trending on the web RIGHT NOW that my specific channel would want to cover."
 - **How to revert**: Remove `channelSearch.js`.
+
+### Change #10C — Channel-Aware AI Summary (Phase C)
+- **Date/Phase**: Phase 10
+- **What was added**: `generateChannelSummary` in `src/services/aiSummary.js` which builds a highly-structured "Content Intelligence Brief" complete with hook ideas, reel structure stepper, and precise angle suggestions tailored entirely around the generated DNA.
+- **What was removed/modified**: N/A
+- **Why**: To provide actionable creator guidance on how exactly to cover the retrieved trending news rather than just summarizing the facts independently.
+- **How to revert**: Remove `generateChannelSummary` from `aiSummary.js`.

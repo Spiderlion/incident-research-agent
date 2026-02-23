@@ -13,4 +13,13 @@ module.exports = {
     ytDlpPath: process.env.YT_DLP_PATH || 'yt-dlp',
     puppeteerHeadless: process.env.PUPPETEER_HEADLESS !== 'false',
   },
+  apify: {
+    token: process.env.APIFY_API_TOKEN,
+    actorId: process.env.APIFY_INSTAGRAM_ACTOR_ID || 'apify~instagram-profile-scraper',
+  },
+  channels: {
+    channel1: process.env.INSTAGRAM_CHANNEL_1 || 'thebigbrandshow_',
+    channel2: process.env.INSTAGRAM_CHANNEL_2 || 'the_dailydecode',
+    cacheHours: parseInt(process.env.CHANNEL_PROFILE_CACHE_HOURS) || 24,
+  }
 };

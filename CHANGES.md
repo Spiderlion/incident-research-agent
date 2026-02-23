@@ -77,4 +77,9 @@ Here is how the system works in plain English:
 - **What was added**: `vercel.json` for deployment routing rules, `api/research.js` and `api/trending.js` as Vercel Serverless Functions. Added comprehensive Vercel deployment steps and limitations to `README.md`.
 - **What was removed/modified**: Updated `package.json` with new `"dev"` and `"vercel-dev"` scripts. Modified `src/services/mediaExtractor.js` to detect `process.env.VERCEL` and gracefully skip `yt-dlp` extraction, returning `null` to ensure the frontend uses safe embed fallbacks.
 - **Why**: To make the project smoothly deployable to Vercel's free tier, adapting the Express routes into Serverless Functions and bypassing CLI binaries (`yt-dlp`) that are unsupported in cloud serverless layers.
-- **How to revert**: Delete the `api/` folder and `vercel.json`. Revert the scripts in `package.json`.
+### Change #10A — Channel Intelligence Mode (Phase A)
+- **Date/Phase**: Phase 10
+- **What was added**: `src/services/channelDNA.js` to scrape Instagram channels via Apify and extract their Content DNA profile using Gemini, caching the JSON result. Added Apify and Channel config to `.env` and `config/index.js`.
+- **What was removed/modified**: N/A
+- **Why**: To understand the exact tone, niche, and format style of specific Instagram creators so we can filter open-web trending news directly for their audience.
+- **How to revert**: Remove `channelDNA.js` and newly added env vars.

@@ -494,7 +494,7 @@ document.addEventListener('DOMContentLoaded', () => {
         trendingResults.innerHTML = '<div class="trending-placeholder"><i class="fa-solid fa-spinner fa-spin"></i> Loading trending news...</div>';
 
         try {
-            const response = await fetch(`/api/trending?period=${period}`);
+            const response = await fetch(`/api/trending?period=${period}&channel=${currentChannel}`);
             if (!response.ok) throw new Error('Failed to fetch trending');
             const data = await response.json();
 

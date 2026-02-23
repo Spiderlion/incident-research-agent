@@ -1,5 +1,5 @@
-const axios = require('axios');
 const config = require('../config');
+const channelDNA = require('./channelDNA');
 
 // Modular configuration for time periods
 // Adding new filters here will instantly support them via the ?period= custom parameter
@@ -15,21 +15,39 @@ const TIME_PERIODS = {
 /**
  * Fetches top trending news using SerpApi Google News.
  * @param {string} period The time filter (default: today)
+ * @param {string} channel The channel username (default: 'all')
  * @returns {Promise<Array>} Array of trending news objects
  */
-async function fetchTrending(period = 'today') {
+async function fetchTrending(period = 'today', channel = 'all') {
     if (!config.apiKeys.serpapi) {
         console.warn('⚠️ [TRENDING] Missing SerpApi key.');
         return [];
     }
 
     const tbsValue = TIME_PERIODS[period] || TIME_PERIODS['today'];
-    console.log(`[TRENDING] Fetching top trending news for period: ${period} (tbs: ${tbsValue})`);
+    let searchQuery = 'news'; // Default global news
+
+    if (channel !== 'all') {
+        try {
+            // Fetch cached DNA profile to get keywords/topics
+            const profile = await channelDNA.getChannelDNA(channel);
+            if (profile && profile.primary_topics && profile.primary_topics.length > 0) {
+                // Combine top 2 topics into a broad trending search
+                const topics = profile.primary_topics.slice(0, 2).join(' OR ');
+                searchQuery = `(${topics}) news`;
+                console.log(`[TRENDING] Contextualizing search for @${channel} with topics: ${topics}`);
+            }
+        } catch (e) {
+            console.error(`[TRENDING] Could not fetch DNA for ${channel}, falling back to general news.`);
+        }
+    }
+
+    console.log(`[TRENDING] Fetching top trending news for period: ${period} (tbs: ${tbsValue}, q: ${searchQuery})`);
 
     try {
         const response = await axios.get('https://serpapi.com/search.json', {
             params: {
-                q: 'news', // Query for general news trending
+                q: searchQuery, // Dynamic query based on channel
                 api_key: config.apiKeys.serpapi,
                 engine: 'google',
                 tbm: 'nws', // News search

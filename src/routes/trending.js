@@ -14,9 +14,10 @@ router.get('/', async (req, res) => {
 
     try {
         const period = req.query.period || 'today';
-        console.log(`\n📈 [API] Fetching trending news for period: ${period}`);
+        const channel = req.query.channel || 'all';
+        console.log(`\n📈 [API] Fetching trending news for period: ${period} | channel: ${channel}`);
 
-        const results = await trendingNews.fetchTrending(period);
+        const results = await trendingNews.fetchTrending(period, channel);
 
         console.log(`✅ [API] Trending news fetched successfully. Return ${results.length} items.`);
         return res.status(200).json(results);

@@ -114,3 +114,14 @@ Here is how the system works in plain English:
 - **What was removed/modified**: Replaced specific model names in `aiSummary.js`, `channelSearch.js`, and `channelDNA.js`.
 - **Why**: The `pro` models have strictly limited API quotas on the free tier (often 2-15 requests per minute or low token limits), which caused the API to throw a 429 error and return the fallback placeholder JSON in the UI. Switching to `flash` utilizes the massive 1M TPM free tier allowance, solving the empty UI bug instantly.
 - **How to revert**: Revert the previous commit targeting the `src/services/` directory.
+
+### Change #11 — Channel Exclusivity & Local Dataset (Phase 11)
+- **Date/Phase**: Phase 11
+- **What was added**: 
+  - Dynamic `channel` parameter support in the `/api/trending` backend and frontend `loadTrendingNews` fetches.
+  - Native filesystem reading of `Dataset_instagram.json` in the AI Summary generation service.
+- **What was removed/modified**: 
+  - `src/services/trendingNews.js` now imports `channelDNA` to build SerpApi queries targeted explicitly to the creator's niche keywords (e.g. `(Startup OR Marketing) news`).
+  - `src/services/aiSummary.js` now filters the local dataset for the active channel, sorts by `videoPlayCount` descending, and injects the exact captions and statistics of the top 3 all-time posts into the Gemini system prompt.
+- **Why**: To deeply contextualize the Reel Context Briefings based on real-world extreme details and provide an exclusive "Trending Panel" rather than generic global news.
+- **How to revert**: Checkout the previous commit.

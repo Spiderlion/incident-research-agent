@@ -33,49 +33,147 @@ document.addEventListener('DOMContentLoaded', () => {
     let allResults = [];
     let currentLayout = 'grid'; // grid | timeline
     let currentFilter = 'all';
+    let currentChannel = 'all'; // 'all' | 'thebigbrandshow_' | 'the_dailydecode'
+    let currentProfile = null;
+
+    // Channel UI Elements
+    const channelTabs = document.querySelectorAll('.channel-tab');
+    const channelModeTag = document.getElementById('channel-mode-tag');
+    const channelTopicsChips = document.getElementById('channel-topics-chips');
+
+    const profileCard = document.getElementById('channel-profile-card');
+    const profileName = document.getElementById('profile-name');
+    const profileToneBadge = document.getElementById('profile-tone-badge');
+    const profileTopicsContainer = document.getElementById('profile-topics-container');
+    const profileFormatStyle = document.getElementById('profile-format-style');
+    const profileAudience = document.getElementById('profile-audience');
+    const profileTimestamp = document.getElementById('profile-timestamp');
+    const refreshProfileBtn = document.querySelector('.refresh-profile-btn');
 
     // Search Submit
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
+
+        // If in channel mode, don't strictly require a query, it auto-generates
         const query = input.value.trim();
-        if (!query) return;
+        if (currentChannel === 'all' && !query) return;
 
         startLoading();
 
         try {
-            const response = await fetch('/api/research', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ query })
-            });
+            let response, data;
 
-            if (!response.ok) throw new Error('API Error');
+            if (currentChannel === 'all') {
+                response = await fetch('/api/research', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ query })
+                });
+                if (!response.ok) throw new Error('API Error');
+                data = await response.json();
+            } else {
+                // Channel Intelligence Mode Search
+                statusText.innerText = `🧠 Activating Channel DNA for @${currentChannel}...`;
+                // If the user typed a specific query, we could append it, but the task says to auto-trigger based on DNA
+                response = await fetch(`/api/channel/search?channel=${currentChannel}`);
+                if (!response.ok) throw new Error('Channel API Error');
+                data = await response.json();
+            }
 
-            const data = await response.json();
             allResults = data.results || [];
 
             // Render structured AI Summary
             if (data.summary) {
-                summaryHeadline.innerText = data.summary.headline;
-                summaryWhatHappened.innerText = data.summary.what_happened;
-                summaryStatus.innerText = data.summary.current_status;
+                if (currentChannel === 'all') {
+                    // Standard Summary
+                    aiSummary.classList.remove('channel-brief-mode');
+                    summaryHeadline.innerText = data.summary.headline;
+                    summaryWhatHappened.innerText = data.summary.what_happened;
+                    summaryStatus.innerText = data.summary.current_status;
 
-                summarySources.innerHTML = '';
-                if (data.summary.key_sources && data.summary.key_sources.length > 0) {
-                    data.summary.key_sources.forEach(source => {
-                        summarySources.innerHTML += `<li><a href="${source.url}" target="_blank">${source.name}</a></li>`;
-                    });
+                    summarySources.innerHTML = '';
+                    if (data.summary.key_sources && data.summary.key_sources.length > 0) {
+                        data.summary.key_sources.forEach(source => {
+                            summarySources.innerHTML += `<li><a href="${source.url}" target="_blank">${source.name}</a></li>`;
+                        });
+                    } else {
+                        summarySources.innerHTML = '<li>No specific sources cited.</li>';
+                    }
+
+                    document.getElementById('summary-status-box').classList.remove('hidden');
+                    document.getElementById('summary-sources-box').classList.remove('hidden');
+
                 } else {
-                    summarySources.innerHTML = '<li>No specific sources cited.</li>';
+                    // Channel Intelligence Brief
+                    aiSummary.classList.add('channel-brief-mode');
+                    summaryHeadline.innerText = data.summary.headline;
+
+                    document.getElementById('summary-status-box').classList.add('hidden');
+                    document.getElementById('summary-sources-box').classList.add('hidden');
+
+                    let briefHtml = `
+                        <div style="margin-bottom:1rem;"><strong>Why this fits:</strong> ${data.summary.why_this_fits}</div>
+                        <div class="suggested-angle-box"><strong>💡 Suggested Angle:</strong> ${data.summary.trending_angle}</div>
+                        
+                        <h4 style="margin-top:2rem; color:var(--primary); margin-bottom:1rem;"><i class="fa-solid fa-clapperboard"></i> Reel Structure Brief</h4>
+                        <div style="margin-bottom:1rem;"><strong>Hook:</strong> <em>"${data.summary.reel_brief?.hook || ''}"</em></div>
+                    `;
+
+                    if (data.summary.reel_brief?.structure) {
+                        briefHtml += `<div class="reel-stepper">`;
+                        data.summary.reel_brief.structure.forEach(step => {
+                            briefHtml += `
+                                <div class="reel-step">
+                                    <div class="reel-step-header">
+                                        <div class="reel-step-title">${step.section}</div>
+                                        <div class="reel-step-dur">${step.duration_seconds}s</div>
+                                    </div>
+                                    <div class="reel-step-content">${step.content}</div>
+                                </div>
+                            `;
+                        });
+                        briefHtml += `</div>`;
+                    }
+
+                    briefHtml += `
+                        <div style="margin-top:1rem; margin-bottom:0.5rem;"><strong>Key Facts to Include:</strong></div>
+                        <ul style="padding-left:1.5rem; color:var(--text-muted); font-size:0.9rem; margin-bottom:1rem;">
+                            ${(data.summary.reel_brief?.key_facts || []).map(f => `<li>${f}</li>`).join('')}
+                        </ul>
+                        <div style="margin-bottom:0.5rem;"><strong>Call to Action:</strong> <em>"${data.summary.reel_brief?.cta || ''}"</em></div>
+                        <div style="font-size:0.8rem; color:var(--primary); margin-bottom:1rem;">${(data.summary.reel_brief?.hashtags || []).join(' ')}</div>
+                        <div style="font-size:0.85rem; color:var(--text-muted);"><strong>Music Mood:</strong> ${data.summary.reel_brief?.music_mood || 'Neutral'}</div>
+                    `;
+
+                    if (data.summary.other_trending_topics && data.summary.other_trending_topics.length > 0) {
+                        briefHtml += `
+                            <h4 style="margin-top:2rem; margin-bottom:1rem; border-top:1px solid var(--border); padding-top:1.5rem;"><i class="fa-solid fa-fire"></i> Other Trending Topics for @${currentChannel}</h4>
+                            <div class="runner-up-topics">
+                        `;
+                        data.summary.other_trending_topics.forEach(topic => {
+                            briefHtml += `
+                                <div class="runner-up-card">
+                                    <h4>${topic.topic}</h4>
+                                    <p>${topic.why_relevant}</p>
+                                    <div class="quick-angle"><i class="fa-solid fa-bolt"></i> ${topic.quick_angle}</div>
+                                </div>
+                            `;
+                        });
+                        briefHtml += `</div>`;
+                    }
+
+                    summaryWhatHappened.innerHTML = briefHtml;
                 }
             } else {
                 summaryHeadline.innerText = "Summary Unavailable";
-                summaryWhatHappened.innerText = "The AI summary generation failed or returned empty data.";
-                summaryStatus.innerText = "N/A";
-                summarySources.innerHTML = "";
+                summaryWhatHappened.innerHTML = "The AI summary generation failed or returned empty data.";
             }
 
-            ambientBg.style.background = 'radial-gradient(circle at 50% 50%, rgba(245, 158, 11, 0.08) 0%, transparent 70%)'; // Shift to amber glow randomly based on content
+            if (currentChannel === 'all') {
+                ambientBg.style.background = 'radial-gradient(circle at 50% 50%, rgba(245, 158, 11, 0.08) 0%, transparent 70%)';
+            } else {
+                ambientBg.style.background = 'radial-gradient(circle at top center, rgba(59, 130, 246, 0.15) 0%, var(--bg-color) 70%)';
+            }
 
             finishLoading();
             renderResults();
@@ -153,12 +251,25 @@ document.addEventListener('DOMContentLoaded', () => {
                 actionHtml = `<a href="${item.source_link}" target="_blank" class="trending-btn" style="margin-top: 1rem; width: 100%; justify-content: center; font-size: 0.85rem;">View Source <i class="fa-solid fa-arrow-up-right-from-square" style="font-size: 0.75rem;"></i></a>`;
             }
 
+            let relevanceHtml = '';
+            let angleHtml = '';
+            if (currentChannel !== 'all' && item.relevance_score) {
+                relevanceHtml = `<div class="relevance-badge">${item.relevance_score}/10 Match</div>`;
+                angleHtml = `
+                    <div class="suggested-angle-box" style="margin-top: 0.5rem; margin-bottom: 1rem;">
+                        <strong>💡 Angle for @${currentChannel}:</strong> ${item.suggested_angle || item.relevance_reason}
+                    </div>
+                `;
+            }
+
             card.innerHTML = `
         ${mediaHtml}
+        ${relevanceHtml}
         <div class="card-content">
           <span class="card-badge">${item.platform.replace('google_images', 'images')}</span>
           <h3 class="card-title"><a href="${item.source_link}" target="_blank">${item.title}</a></h3>
           <p class="card-desc">${item.description || ''}</p>
+          ${angleHtml}
           <div class="card-footer">
             <span>${item.source || 'Web Result'}</span>
             <span>${dateStr}</span>
@@ -248,6 +359,93 @@ document.addEventListener('DOMContentLoaded', () => {
             resultsContainer.classList.add('layout-grid');
         }
         renderResults();
+    });
+
+    // Channel Tab Logic
+    channelTabs.forEach(tab => {
+        tab.addEventListener('click', async (e) => {
+            const selectedChannel = e.currentTarget.getAttribute('data-channel');
+            if (currentChannel === selectedChannel) return; // Ignore if already selected
+
+            channelTabs.forEach(t => t.classList.remove('active'));
+            e.currentTarget.classList.add('active');
+            currentChannel = selectedChannel;
+
+            if (currentChannel === 'all') {
+                document.body.classList.remove('channel-mode-active');
+                input.placeholder = "Ask anything about an incident...";
+                channelModeTag.classList.add('hidden');
+                channelTopicsChips.classList.add('hidden');
+                profileCard.classList.add('hidden');
+                profileCard.classList.add('collapsed');
+                aiSummary.classList.add('hidden'); // Hide summary until next search
+                resultsContainer.innerHTML = `<div id="welcome-state"><i class="fa-solid fa-globe"></i><h2>Ready to research.</h2><p>Enter a query above to orchestrate a parallel search across Google, News, and YouTube.</p></div>`;
+            } else {
+                document.body.classList.add('channel-mode-active');
+                input.placeholder = `Search trends for @${currentChannel} (or leave blank to auto-detect)...`;
+
+                // Hide old results
+                resultsContainer.innerHTML = '';
+                aiSummary.classList.add('hidden');
+
+                await fetchAndDisplayProfile(currentChannel, false);
+            }
+        });
+    });
+
+    async function fetchAndDisplayProfile(channel, forceRefresh = false) {
+        profileCard.classList.remove('hidden');
+        profileCard.classList.add('collapsed'); // start collapsed while loading
+
+        channelModeTag.classList.remove('hidden');
+        channelModeTag.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Analyzing Instagram Profile DNA...`;
+        channelTopicsChips.classList.add('hidden');
+
+        if (forceRefresh) {
+            refreshProfileBtn.classList.add('spinning');
+        }
+
+        try {
+            const res = await fetch(`/api/channel/profile?channel=${channel}${forceRefresh ? '&refresh=true' : ''}`);
+            if (!res.ok) throw new Error('Profile fetch failed');
+            const profile = await res.json();
+            currentProfile = profile;
+
+            // Populate Card
+            profileName.innerText = `@${profile.channel}`;
+            profileToneBadge.innerText = profile.content_tone;
+            profileFormatStyle.innerText = profile.format_style;
+            profileAudience.innerText = `Target Audience: ${profile.target_audience}`;
+
+            const date = new Date(profile.analysed_at);
+            profileTimestamp.innerText = isNaN(date.getTime()) ? 'Just now' : date.toLocaleString();
+
+            // Populate Topics
+            profileTopicsContainer.innerHTML = '';
+            channelTopicsChips.innerHTML = '';
+            (profile.primary_topics || []).slice(0, 5).forEach(topic => {
+                profileTopicsContainer.innerHTML += `<span class="topic-chip">${topic}</span>`;
+                channelTopicsChips.innerHTML += `<span class="topic-chip">${topic}</span>`;
+            });
+
+            // Show UI
+            channelModeTag.innerHTML = `Showing results filtered for <strong>@${channel}</strong> content DNA`;
+            channelTopicsChips.classList.remove('hidden');
+            profileCard.classList.remove('collapsed');
+
+        } catch (e) {
+            console.error(e);
+            channelModeTag.innerHTML = `<span style="color: #ef4444;"><i class="fa-solid fa-triangle-exclamation"></i> Error loading channel profile DNA.</span>`;
+        } finally {
+            refreshProfileBtn.classList.remove('spinning');
+        }
+    }
+
+    refreshProfileBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        if (currentChannel !== 'all') {
+            fetchAndDisplayProfile(currentChannel, true);
+        }
     });
 
     // Filters

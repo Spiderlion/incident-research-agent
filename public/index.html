@@ -37,6 +37,13 @@
     </div>
 
     <div class="search-container">
+      <!-- Channel Intelligence Filter Bar -->
+      <div class="channel-filter-bar">
+        <button class="channel-tab active" data-channel="all">🌐 All Web</button>
+        <button class="channel-tab" data-channel="thebigbrandshow_">📺 thebigbrandshow_</button>
+        <button class="channel-tab" data-channel="the_dailydecode">📱 the_dailydecode</button>
+      </div>
+
       <div class="search-row">
         <form id="search-form">
           <i class="fa-solid fa-sparkles spark-icon"></i>
@@ -48,6 +55,10 @@
           <i class="fa-solid fa-newspaper"></i> Trending
         </button>
       </div>
+    </div>
+    <!-- Small tag injected by JS when channel mode active -->
+    <div id="channel-mode-tag" class="hidden"></div>
+    <div id="channel-topics-chips" class="hidden"></div>
     </div>
 
     <div class="header-actions">
@@ -64,6 +75,27 @@
   </div>
 
   <main>
+
+    <!-- Channel Profile Card -->
+    <div id="channel-profile-card" class="hidden collapsed">
+      <div class="profile-card-header">
+        <div class="profile-card-title">
+          <i class="fa-brands fa-instagram"></i>
+          <h3 id="profile-name">@thebigbrandshow_</h3>
+          <span id="profile-tone-badge" class="tone-badge">Educational</span>
+        </div>
+        <button class="refresh-profile-btn" title="Refresh Profile from Instagram"><i
+            class="fa-solid fa-arrows-rotate"></i></button>
+      </div>
+      <div class="profile-card-content">
+        <div class="profile-topics" id="profile-topics-container"></div>
+        <p id="profile-format-style" class="profile-italic"></p>
+        <p id="profile-audience" class="profile-italic"></p>
+        <div class="profile-meta">
+          <span>Last analysed: <span id="profile-timestamp"></span></span>
+        </div>
+      </div>
+    </div>
 
     <!-- AI Summary Banner -->
     <div id="ai-summary" class="hidden collapsed">

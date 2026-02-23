@@ -275,6 +275,284 @@ main {
   padding: 2rem;
 }
 
+/* --- Channel Intelligence Mode --- */
+body.channel-mode-active {
+  background: radial-gradient(circle at top center, rgba(59, 130, 246, 0.08) 0%, var(--bg-color) 70%);
+}
+
+.channel-filter-bar {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  justify-content: center;
+}
+
+.channel-tab {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  padding: 0.6rem 1.25rem;
+  border-radius: 999px;
+  font-family: var(--font-brand);
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.channel-tab:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--text-main);
+}
+
+.channel-tab.active {
+  background: rgba(59, 130, 246, 0.1);
+  color: #fff;
+  border-color: rgba(59, 130, 246, 0.5);
+  box-shadow: 0 0 15px rgba(59, 130, 246, 0.3);
+}
+
+#channel-mode-tag {
+  text-align: center;
+  font-size: 0.85rem;
+  color: var(--primary);
+  margin-top: 1rem;
+  font-weight: 500;
+}
+
+.topic-chip {
+  display: inline-block;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  padding: 0.25rem 0.75rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  margin: 0.25rem;
+}
+
+#channel-topics-chips {
+  text-align: center;
+  margin-top: 0.5rem;
+}
+
+/* Channel Profile Card */
+#channel-profile-card {
+  background: linear-gradient(145deg, var(--bg-surface) 0%, #1a1e26 100%);
+  border: 1px solid rgba(59, 130, 246, 0.3);
+  border-radius: 12px;
+  margin-bottom: 2rem;
+  overflow: hidden;
+  transition: var(--transition);
+}
+
+.profile-card-header {
+  padding: 1rem 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: rgba(59, 130, 246, 0.05);
+  border-bottom: 1px solid var(--border);
+}
+
+.profile-card-title {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.profile-card-title i {
+  color: #E1306C;
+  font-size: 1.25rem;
+}
+
+.profile-card-title h3 {
+  font-size: 1.1rem;
+  color: var(--text-main);
+}
+
+.tone-badge {
+  background: rgba(245, 158, 11, 0.15);
+  color: var(--accent);
+  padding: 0.2rem 0.6rem;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+}
+
+.refresh-profile-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.refresh-profile-btn:hover {
+  color: var(--primary);
+  transform: rotate(180deg);
+}
+
+.refresh-profile-btn.spinning {
+  animation: spin 1s linear infinite;
+  pointer-events: none;
+}
+
+@keyframes spin {
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.profile-card-content {
+  padding: 1.5rem;
+}
+
+.profile-italic {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  font-style: italic;
+  margin-bottom: 0.75rem;
+}
+
+.profile-meta {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.3);
+  margin-top: 1rem;
+  text-align: right;
+}
+
+/* Reel Brief Stepper */
+.reel-stepper {
+  margin-top: 1.5rem;
+  padding-left: 1rem;
+  border-left: 2px solid var(--border);
+}
+
+.reel-step {
+  position: relative;
+  padding-left: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.reel-step::before {
+  content: '';
+  position: absolute;
+  left: -1rem;
+  top: 0.25rem;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--bg-surface);
+  border: 2px solid var(--primary);
+  transform: translateX(-50%);
+}
+
+.reel-step-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.reel-step-title {
+  font-weight: 600;
+  color: var(--primary);
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.reel-step-dur {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  background: rgba(255, 255, 255, 0.05);
+  padding: 0.1rem 0.4rem;
+  border-radius: 4px;
+}
+
+.reel-step-content {
+  font-size: 0.95rem;
+  color: var(--text-main);
+  line-height: 1.5;
+}
+
+.suggested-angle-box {
+  background: rgba(245, 158, 11, 0.1);
+  border-left: 3px solid var(--accent);
+  padding: 0.75rem;
+  margin-top: 1rem;
+  font-size: 0.85rem;
+  border-radius: 0 4px 4px 0;
+}
+
+.suggested-angle-box strong {
+  color: var(--accent);
+}
+
+.relevance-badge {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: rgba(16, 185, 129, 0.2);
+  color: #10b981;
+  border: 1px solid rgba(16, 185, 129, 0.4);
+  padding: 0.25rem 0.5rem;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  z-index: 10;
+  backdrop-filter: blur(4px);
+}
+
+/* AI Summary Overrides for Intelligence Brief */
+#ai-summary.channel-brief-mode {
+  border-color: var(--primary);
+  box-shadow: 0 0 20px rgba(59, 130, 246, 0.15);
+}
+
+#ai-summary.channel-brief-mode .summary-header h3 {
+  color: #fff;
+}
+
+#ai-summary.channel-brief-mode .summary-header i {
+  color: var(--primary);
+}
+
+/* Other Trending Topics Grid inside Brief */
+.runner-up-topics {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.runner-up-card {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--border);
+  padding: 1rem;
+  border-radius: 8px;
+}
+
+.runner-up-card h4 {
+  font-size: 0.95rem;
+  color: var(--text-main);
+  margin-bottom: 0.5rem;
+}
+
+.runner-up-card p {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin-bottom: 0.5rem;
+}
+
+.runner-up-card .quick-angle {
+  font-size: 0.8rem;
+  color: var(--primary);
+  font-style: italic;
+}
+
 /* AI Summary */
 #ai-summary {
   background: linear-gradient(145deg, var(--bg-surface) 0%, #111 100%);

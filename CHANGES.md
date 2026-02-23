@@ -100,3 +100,10 @@ Here is how the system works in plain English:
 - **What was removed/modified**: Configured `src/server.js` to mount these new routes.
 - **Why**: To expose the new Channel Intelligence backend logic securely to the frontend dashboard.
 - **How to revert**: Remove `src/routes/channel.js` and its mounting logic in `src/server.js`.
+
+### Change #10E — Frontend UI Integration (Phase E)
+- **Date/Phase**: Phase 10
+- **What was added**: A Channel Filter bar above the search input to toggle modes, and a Channel DNA Profile card that reveals above the AI summary when a channel is active. Also injected logic to parse the highly-structured "Reel Brief" from the AI.
+- **What was removed/modified**: `public/index.html`, `public/css/style.css`, and `public/js/app.js` were heavily updated to intercept searches depending on the active channel tab, switching from standard incident reporting to Creator Intelligence mode.
+- **Why**: To deliver the final Channel Intelligence user experience.
+- **How to revert**: Checkout the previous commit for `public` directory.

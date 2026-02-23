@@ -75,7 +75,7 @@ async function analyzeWithGemini(username, posts) {
     console.log(`[CHANNEL-DNA] Sending ${posts.length} posts to Gemini for DNA analysis...`);
 
     const response = await ai.models.generateContent({
-        model: 'gemini-2.5-pro',
+        model: 'gemini-2.5-flash',
         contents: [
             { role: 'user', parts: [{ text: SYSTEM_PROMPT + '\n\n' + promptContext }] }
         ],

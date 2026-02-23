@@ -107,3 +107,10 @@ Here is how the system works in plain English:
 - **What was removed/modified**: `public/index.html`, `public/css/style.css`, and `public/js/app.js` were heavily updated to intercept searches depending on the active channel tab, switching from standard incident reporting to Creator Intelligence mode.
 - **Why**: To deliver the final Channel Intelligence user experience.
 - **How to revert**: Checkout the previous commit for `public` directory.
+
+### Bug Fix: Gemini Rate Limiting (Phase 10)
+- **Date/Phase**: Post-Phase 10
+- **What was added**: Switched all Google Gen AI models from `gemini-2.5-pro` to `gemini-2.5-flash`.
+- **What was removed/modified**: Replaced specific model names in `aiSummary.js`, `channelSearch.js`, and `channelDNA.js`.
+- **Why**: The `pro` models have strictly limited API quotas on the free tier (often 2-15 requests per minute or low token limits), which caused the API to throw a 429 error and return the fallback placeholder JSON in the UI. Switching to `flash` utilizes the massive 1M TPM free tier allowance, solving the empty UI bug instantly.
+- **How to revert**: Revert the previous commit targeting the `src/services/` directory.

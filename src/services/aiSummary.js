@@ -36,7 +36,7 @@ async function generateSummary(query, context) {
             const ai = new GoogleGenAI({ apiKey: config.apiKeys.gemini });
 
             const response = await ai.models.generateContent({
-                model: 'gemini-2.5-pro',
+                model: 'gemini-2.5-flash',
                 contents: [
                     { role: 'user', parts: [{ text: SYSTEM_PROMPT + '\n\n' + prompt }] }
                 ],
@@ -137,7 +137,7 @@ async function generateChannelSummary(dnaProfile, topResults) {
             const ai = new GoogleGenAI({ apiKey: config.apiKeys.gemini });
 
             const response = await ai.models.generateContent({
-                model: 'gemini-2.5-pro',
+                model: 'gemini-2.5-flash',
                 contents: [
                     { role: 'user', parts: [{ text: CHANNEL_SYSTEM_PROMPT + '\n\n' + prompt }] }
                 ],

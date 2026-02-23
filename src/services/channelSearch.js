@@ -87,7 +87,7 @@ async function searchForChannel(dnaProfile) {
 
     try {
         const response = await ai.models.generateContent({
-            model: 'gemini-2.5-pro',
+            model: 'gemini-2.5-flash',
             contents: [
                 { role: 'user', parts: [{ text: RELEVANCE_PROMPT + '\n\n' + promptContext }] }
             ],
